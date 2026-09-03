@@ -15,8 +15,11 @@ void modbus_poll_data(const device_config_t *cfg) {
     return;
 
   Serial.println("--- Polling Modbus ---");
-  node.begin(cfg->slave_id, Serial2); // Cập nhật lại Slave ID theo JSON
-
+  static uint8_t last_slave_id = 0;
+  if (last_slave_id != cfg->slave_id) {
+    node.begin(cfg->slave_id, Serial2); // update Slave ID only when it changes
+    last_slave_id = cfg->slave_id;
+  }
   for (int i = 0; i < cfg->register_count; i++) {
     const register_config_t *reg = &cfg->registers[i];
     uint8_t result;
