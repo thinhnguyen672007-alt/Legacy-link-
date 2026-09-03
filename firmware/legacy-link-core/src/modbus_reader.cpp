@@ -17,16 +17,6 @@ void modbus_poll_data(const device_config_t *cfg) {
   Serial.println("--- Polling Modbus ---");
   node.begin(cfg->slave_id, Serial2); // Cập nhật lại Slave ID theo JSON
 
-  /* VIẾT CODE CỦA BẠN VÀO ĐÂY */
-  // 1. Viết 1 vòng lặp for chạy từ i = 0 đến cfg->register_count
-  // 2. Bên trong vòng lặp, tạo 1 biến con trỏ để truy xuất thanh ghi hiện tại:
-  //    const register_config_t* reg = &cfg->registers[i];
-  // 3. Khai báo: uint8_t result;
-  // 4. Khai báo: uint16_t data = 0;
-  // 5. Kiểm tra reg->function_code:
-  //    - Nếu == 3, thì: result = node.readHoldingRegisters(reg->address, 1);
-  //    - Nếu == 4, thì: result = node.readInputRegisters(reg->address, 1);
-  //    - Nếu khác 3 và 4: Dùng continue; để bỏ qua.
   for (int i = 0; i < cfg->register_count; i++) {
     const register_config_t *reg = &cfg->registers[i];
     uint8_t result;
@@ -38,9 +28,6 @@ void modbus_poll_data(const device_config_t *cfg) {
     } else {
       continue;
     }
-
-    // 6. Sau khối if-else ở trên, ta in kết quả (Code phần này mình viết sẵn
-    // cho bạn):
 
     if (result == node.ku8MBSuccess) {
       data = node.getResponseBuffer(0);
