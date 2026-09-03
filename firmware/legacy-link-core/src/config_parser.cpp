@@ -55,7 +55,7 @@ static uint32_t get_serial_config(uint8_t parity, uint8_t stop_bits) {
 }
 
 bool parse_device_config(const char *json_payload, device_config_t *out) {
-  StaticJsonDocument<1024> doc;
+  StaticJsonDocument<4096> doc;
 
   DeserializationError err = deserializeJson(doc, json_payload);
   if (err) {
