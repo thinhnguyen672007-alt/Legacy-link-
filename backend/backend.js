@@ -1,37 +1,57 @@
-const mqtt = require("mqtt");
+const mqtt = require('mqtt');
+const mysql = require('mysql2');
+
+
+// Kết nối database
+
+const db = mysql.createConnection({
+  host: 'localhost',       
+  user: 'root',            // Tên đăng nhập 
+  password: '',            // Mật khẩu MySQL
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error(" Không thể kết nối Database:", err.message);
+    return;
+  }
+  console.log(" Đã kết nối thành công tới Database MySQL!");
+});
+
+
+// Kết nối MQTT và kết nối dữ liệu 
 
 const client = mqtt.connect('mqtt://broker.hivemq.com');
 
-client.on("connect" () => {
-    console.log(" Backend kết nối thành công với MQTT");
-
-    const topicToListen = 'legacylink/gw/+/telemetry'; // Đẩy dự liệu của cá máy CNC lên backend
-
-    client.subscribe(topicToListen, (err) => {
-    if (!err) {
-      console.log(`📡 Đang túc trực lắng nghe dữ liệu tại: ${topicToListen}`);
-    }
-  });
+client.on('connect', () => {
+  console.log("🟢 Đã kết nối tới trạm MQTT!");
+  client.subscribe('legacylink/gw/+/telemetry');
 });
 
-client.on("message", (topic, message) => {
-    try {
-        const rawString = message.toString();
+client.on('message', (topic, message) => {
+  try {
+    const parsedData = JSON.parse(message.toString());
+    const gatewayId = topic.split('/')[2]; 
+    const nhietDo = parsedData.devices[0].temperature;
+    const trangThai = parsedData.devices[0].status;
 
-        const parsedData = JSON.parse(rawString);
-        console.log(`\n📦 Vừa bắt được gói hàng từ Topic: ${topic}`);
+    console.log(`\n📦 Nhận dữ liệu từ ${gatewayId}: Nhiệt độ ${nhietDo}°C`);
 
-        const gatewayId = topic.split('/')[2]; 
-        const thoiGian = new Date(parsedData.timestamp).toLocaleTimeString();
-        const nhietDo = parsedData.devices[0].temperature;
-        const trangThai = parsedData.devices[0].status;
+   
+    // insert vào database 
+   
+    const sql = `INSERT INTO telemetry_data (gateway_id, temperature, status) VALUES (?, ?, ?)`;
+    const values = [gatewayId, nhietDo, trangThai];
 
-        console.log(`🔥 [${thoiGian}] Gateway ${gatewayId} báo cáo: Nhiệt độ máy CNC là ${nhietDo}°C - Trạng thái: ${trangThai}`);
-
-    
-        console.log(" Lưu vào database");
+    db.query(sql, values, (err, results) => {
+      if (err) {
+        console.error("Lỗi khi lưu vào DB:", err.message);
+      } else {
+        console.log(` Đã lưu vào DB thành công! (ID dòng vừa tạo: ${results.insertId})`);
+      }
+    });
 
   } catch (error) {
-    console.log(" Lỗi khi bóc tách JSON (Có thể định dạng gửi lên bị rách):", error.message);
+    console.log(" Lỗi xử lý dữ liệu:", error.message);
   }
-});
+});cô
