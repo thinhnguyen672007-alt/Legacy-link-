@@ -4,18 +4,23 @@ const mysql = require('mysql2');
 
 // Kết nối database
 
-const db = mysql.createConnection({
-  host: 'localhost',       
-  user: 'root',            // Tên đăng nhập 
-  password: '',            // Mật khẩu MySQL
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'iot_legacylink',
+  waitForConnections: true,
+  connectionLimit: 10, 
+  queueLimit: 0
 });
 
-db.connect((err) => {
+pool.getConnection((err) => {
   if (err) {
     console.error(" Không thể kết nối Database:", err.message);
     return;
   }
   console.log(" Đã kết nối thành công tới Database MySQL!");
+  connection.release
 });
 
 
@@ -43,7 +48,7 @@ client.on('message', (topic, message) => {
     const sql = `INSERT INTO telemetry_data (gateway_id, temperature, status) VALUES (?, ?, ?)`;
     const values = [gatewayId, nhietDo, trangThai];
 
-    db.query(sql, values, (err, results) => {
+    pool.query(sql, values, (err, results) => {
       if (err) {
         console.error("Lỗi khi lưu vào DB:", err.message);
       } else {
@@ -54,4 +59,4 @@ client.on('message', (topic, message) => {
   } catch (error) {
     console.log(" Lỗi xử lý dữ liệu:", error.message);
   }
-});cô
+});
