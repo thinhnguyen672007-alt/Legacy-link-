@@ -25,7 +25,8 @@ infrastructure/
 │   ├── setup-mosquitto-auth.sh    # Helper script to generate hashed password file
 │   └── test-mqtt.sh               # Quick pub/sub verification script
 ├── docs/
-│   └── architecture.md            # Network topology & integration details
+│   ├── architecture.md            # Network topology & integration details
+│   └── runbook.md                 # Operations & troubleshooting runbook (Tiếng Việt)
 ├── .env.example                   # Template environment variables
 ├── .gitignore                     # Ignores runtime data, logs, and sensitive credentials
 ├── docker-compose.yml             # Service orchestration definition
@@ -106,7 +107,8 @@ infrastructure/
 │   ├── setup-mosquitto-auth.sh    # Script tạo file mật khẩu hash bằng Docker
 │   └── test-mqtt.sh               # Script kiểm tra nhanh kết nối pub/sub
 ├── docs/
-│   └── architecture.md            # Tài liệu kiến trúc mạng & tích hợp
+│   ├── architecture.md            # Tài liệu kiến trúc mạng & tích hợp
+│   └── runbook.md                 # Cẩm nang vận hành & xử lý sự cố (Runbook)
 ├── .env.example                   # Biến môi trường mẫu
 ├── .gitignore                     # Bỏ qua data, log và credentials nhạy cảm
 ├── docker-compose.yml             # File cấu hình khởi chạy dịch vụ Docker
