@@ -13,12 +13,24 @@
 services:
   mosquitto:
     image: eclipse-mosquitto:2
+    container_name: ${MQTT_CONTAINER_NAME:-legacy-link-mosquitto}
     ports:
-      - "1883:1883"
+      - "${MQTT_PORT:-1883}:1883"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro #syntax: HOST_PATH:CONTAINER_PATH:MODE
       # Container path used by the Mosquitto image for its config file
       - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/config/passwd:/mosquitto/config/passwd:ro
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - legacy-link-net
+
+networks:
+  legacy-link-net:
+    name: ${DOCKER_NETWORK_NAME:-legacy-link-net}
+    driver: bridge
+
+
 
 
 
