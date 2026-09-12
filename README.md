@@ -1,40 +1,70 @@
 # Legacy-link
 
-Configuration-Driven Low-Cost Gateway for Legacy Equipment
+Configuration-driven, low-cost gateway for connecting legacy equipment to modern software.
 
-> **Current Branch:** `feature/infra-base`  
-> **Focus:** Initial Infrastructure Foundation (Docker & Mosquitto MQTT)
+> Status: early prototype. The current firmware validates ESP32 UART communication with a serial echo test.
 
----
+## Overview
 
-## English
+Legacy-link is intended to bridge older industrial or laboratory equipment with modern applications through a configurable gateway. The repository is organized so the firmware, future backend, frontend, simulators, and documentation can evolve independently.
+    
+## Repository Layout
 
-### About This Branch (`feature/infra-base`)
-The `feature/infra-base` branch establishes the initial infrastructure foundation for the **Legacy-link** project.
+| Directory | Purpose |
+| --- | --- |
+| `firmware/` | PlatformIO firmware for the ESP32 gateway |
+| `backend/` | Planned service and API layer |
+| `frontend/` | Planned operator interface |
+| `simulators/` | Planned hardware and protocol simulators |
+| `tests/` | Cross-component and integration tests |
+| `docs/` | Architecture, hardware, and protocol documentation |
 
-While other team members develop the ESP32 gateway firmware (`firmware/`), backend services (`backend/`), and operator interfaces (`frontend/`), this branch provides a clean, containerized Docker environment and message broker that connects all components together.
+## Current Firmware
 
-### Key Deliverables on This Branch
-- **Docker Compose Setup**: Unified service orchestration for local development and testing.
-- **Mosquitto MQTT Broker**: Central communication bus for telemetry published by the ESP32 gateway and consumed by backend services or simulators.
-- **Authentication & Security**: Secure MQTT configuration with username/password authentication, anonymous access disabled, and sensitive credentials excluded from Git.
-- **Organized Structure**: Clear separation between static configurations, runtime data, logs, and helper scripts.
+The current `esp32dev` target initializes UART0 at `115200` baud and echoes newline-terminated input. This is a hardware bring-up test, not the final gateway protocol.
 
-For detailed setup, commands, and configuration guides, see the [Infrastructure Documentation](infrastructure/README.md).
+### Requirements
 
----
+- ESP32 Dev Module
+- VS Code with PlatformIO, or the PlatformIO CLI
+- USB data cable and the appropriate CP210x driver, if required by the board
 
-## Tiếng Việt
+### Build
 
-### Giới thiệu về nhánh này (`feature/infra-base`)
-Nhánh `feature/infra-base` chịu trách nhiệm xây dựng nền tảng hạ tầng cơ sở ban đầu cho dự án **Legacy-link**.
+From the repository root:
 
-Trong khi các thành viên khác tập trung phát triển firmware cho ESP32 (`firmware/`), các dịch vụ backend (`backend/`), và giao diện người dùng (`frontend/`), nhánh này cung cấp môi trường Docker hóa và hệ thống Message Broker trung gian để kết nối tất cả các thành phần lại với nhau.
+```powershell
+pio run -d firmware/legacy-link-core
+```
 
-### Các hạng mục chính trên nhánh
-- **Cấu hình Docker Compose**: Quản lý và điều phối các dịch vụ hạ tầng tập trung cho môi trường phát triển cục bộ.
-- **Mosquitto MQTT Broker**: Kênh truyền thông điệp trung tâm tiếp nhận dữ liệu cảm biến/Modbus từ ESP32 gateway và phân phối tới backend hoặc các trình giả lập.
-- **Bảo mật & Xác thực**: Thiết lập MQTT an toàn yêu cầu tài khoản/mật khẩu, vô hiệu hóa truy cập ẩn danh (anonymous), và bảo vệ tuyệt đối các thông tin nhạy cảm khỏi Git.
-- **Cấu trúc tổ chức chuẩn**: Tách bạch rõ ràng giữa file cấu hình tĩnh, dữ liệu thực thi (runtime data), nhật ký (logs), và các kịch bản tiện ích.
+Upload to a connected board by specifying the port for your machine:
 
-Để xem hướng dẫn chi tiết cách cấu hình, khởi chạy và mở rộng hạ tầng, vui lòng xem [Tài liệu Hạ tầng (infrastructure/README.md)](infrastructure/README.md).
+```powershell
+pio run -d firmware/legacy-link-core -t upload --upload-port COM3
+```
+
+Monitor the serial output:
+
+```powershell
+pio device monitor -d firmware/legacy-link-core -b 115200
+```
+
+Type a line and press Enter. The board should print the received text back over UART0.
+
+## Roadmap
+
+- Define the legacy device protocol and configuration schema
+- Add framed UART parsing and validation
+- Add simulator-driven tests for malformed and partial messages
+- Implement the backend gateway API
+- Add a frontend for device status and configuration
+- Document supported hardware, wiring, and deployment
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Keep changes focused, explain hardware-dependent behavior, and include a test or build command in the pull request description.
+
+## License
+
+No license has been selected yet. Until one is added, the default copyright rules apply and reuse is not automatically permitted.
+
